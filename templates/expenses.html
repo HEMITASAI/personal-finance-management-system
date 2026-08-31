@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>💸 Expenses</h1>
+
+        <p class="muted">
+            Keep your spending under control.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary-grid">
+
+    <div class="summary-card expense-card">
+
+        <div class="summary-icon">💸</div>
+
+        <div>
+
+            <span>Current Month Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_expenses) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-card balance-card">
+
+        <div class="summary-icon">🏦</div>
+
+        <div>
+
+            <span>Current Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(balance) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADD EXPENSE -->
+
+<div class="add-section compact-add">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>Add Expense</h2>
+
+            <p class="muted">
+                This transaction is automatically saved as an expense.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        action="{{ url_for('add_transaction') }}"
+        method="POST"
+        class="transaction-creator"
+    >
+
+        <input
+            type="hidden"
+            name="transaction_type"
+            value="expense"
+        >
+
+
+        <!-- AMOUNT -->
+
+        <div class="amount-box expense-input">
+
+            <span>₹</span>
+
+            <input
+                type="number"
+                name="amount"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+        <!-- CATEGORY + DESCRIPTION -->
+
+        <div class="creator-grid">
+
+            <div class="creator-field">
+
+                <label>Category</label>
+
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="Food, Shopping, Transport..."
+                    required
+                >
+
+            </div>
+
+
+            <div class="creator-field">
+
+                <label>Description</label>
+
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Optional note"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT METHOD -->
+
+        <div class="payment-area">
+
+            <label>Payment Method</label>
+
+            <div class="payment-buttons">
+
+                <button
+                    type="button"
+                    onclick="selectExpensePayment('cash', this)"
+                >
+                    💵 Cash
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="selectExpensePayment('upi', this)"
+                >
+                    📱 UPI
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="selectExpensePayment('bank_transfer', this)"
+                >
+                    🏦 Bank Transfer
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="selectExpensePayment('card', this)"
+                >
+                    💳 Card
+                </button>
+
+            </div>
+
+
+            <input
+                type="hidden"
+                name="payment_method"
+                id="expense_payment_method"
+                required
+            >
+
+        </div>
+
+
+        <!-- SAVE -->
+
+        <button
+            class="save-button expense-save"
+            type="submit"
+        >
+            💸 Save Expense
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- EXPENSE HISTORY -->
+
+<div class="section-heading transaction-heading">
+
+    <div>
+
+        <h2>Expense History</h2>
+
+    </div>
+
+</div>
+
+
+<div class="expense-history-list">
+
+{% for transaction in transactions %}
+
+    <div class="expense-history-card">
+
+
+        <!-- EXPENSE DETAILS -->
+
+        <div class="expense-details">
+
+
+            <div class="expense-row">
+
+                <span class="expense-label">
+                    Category
+                </span>
+
+                <strong>
+                    {{ transaction.category }}
+                </strong>
+
+            </div>
+
+
+            <div class="expense-row">
+
+                <span class="expense-label">
+                    Date
+                </span>
+
+                <strong>
+
+                    📅
+
+                    {{ transaction.date.strftime("%d-%m-%Y")
+                       if transaction.date else "" }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="expense-row">
+
+                <span class="expense-label">
+                    Amount
+                </span>
+
+                <strong class="expense-history-amount">
+
+                    - ₹{{ "%.2f"|format(transaction.amount) }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="expense-row">
+
+                <span class="expense-label">
+                    Description
+                </span>
+
+                <strong>
+                    {{ transaction.description or "No description" }}
+                </strong>
+
+            </div>
+
+
+            <div class="expense-row">
+
+                <span class="expense-label">
+                    Payment Method
+                </span>
+
+                <strong>
+
+                    {% if transaction.payment_method == "cash" %}
+
+                        💵 Cash
+
+                    {% elif transaction.payment_method == "upi" %}
+
+                        📱 UPI
+
+                    {% elif transaction.payment_method == "bank_transfer" %}
+
+                        🏦 Bank Transfer
+
+                    {% elif transaction.payment_method == "card" %}
+
+                        💳 Card
+
+                    {% else %}
+
+                        {{ transaction.payment_method }}
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- EDIT / DELETE -->
+
+        <div class="expense-actions">
+
+
+            <a
+                href="{{ url_for(
+                    'edit_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="expense-action"
+            >
+                ✏️ Edit
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'delete_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="expense-action"
+                onclick="return confirm('Delete this expense transaction?')"
+            >
+                🗑️ Delete
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+{% else %}
+
+    <div class="empty-state">
+
+        <div>💸</div>
+
+        <h3>No expenses yet</h3>
+
+        <p>
+            Add your first expense above.
+        </p>
+
+    </div>
+
+{% endfor %}
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+function selectExpensePayment(method, button) {
+
+    document.getElementById("expense_payment_method").value = method;
+
+
+    document
+        .querySelectorAll(".payment-buttons button")
+        .forEach(function(btn) {
+
+            btn.classList.remove("selected");
+
+        });
+
+
+    button.classList.add("selected");
+
+}
+
+</script>
+
+{% endblock %}

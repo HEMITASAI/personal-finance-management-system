@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>👶Paapudhu💰</h1>
+        <h2>veaa veaa 🥳😇</h2>
+
+
+        <p class="muted">
+            Track your salary transactions.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- TOTAL SUMMARY -->
+
+<div class="summary-grid">
+
+    <div class="summary-card income-card">
+
+        <div class="summary-icon">💰</div>
+
+        <div>
+            <span>Total Salary</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_income_all) }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="summary-card expense-card">
+
+        <div class="summary-icon">💸</div>
+
+        <div>
+            <span>Total Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_expenses_all) }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="summary-card balance-card">
+
+        <div class="summary-icon">🏦</div>
+
+        <div>
+            <span>Total Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_balance) }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CURRENT MONTH -->
+
+<div class="summary-grid">
+
+    <div class="summary-card income-card">
+
+        <div class="summary-icon">💰</div>
+
+        <div>
+            <span>Current Month Salary</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_income) }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="summary-card expense-card">
+
+        <div class="summary-icon">💸</div>
+
+        <div>
+            <span>Current Month Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_month_expenses) }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="summary-card balance-card">
+
+        <div class="summary-icon">🏦</div>
+
+        <div>
+            <span>Current Month Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(balance) }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADD SALARY -->
+
+<div class="add-section compact-add">
+
+    <div class="section-heading">
+
+        <div>
+            <h2>Add Salary</h2>
+
+            <p class="muted">
+                Record a new salary transaction.
+            </p>
+        </div>
+
+    </div>
+
+
+    <form
+        action="{{ url_for('add_transaction') }}"
+        method="POST"
+        class="transaction-creator"
+    >
+
+        <input
+            type="hidden"
+            name="transaction_type"
+            value="income"
+        >
+
+
+        <div class="amount-box">
+
+            <span>₹</span>
+
+            <input
+                type="number"
+                name="amount"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+        <div class="creator-grid">
+
+            <div class="creator-field">
+
+                <label>Category</label>
+
+                <input
+                    type="text"
+                    name="category"
+                    value="Salary"
+                    required
+                >
+
+            </div>
+
+
+            <div class="creator-field">
+
+                <label>Description</label>
+
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Optional note"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="payment-area">
+
+            <label>Payment Method</label>
+
+            <div class="payment-buttons">
+
+                <button
+                    type="button"
+                    onclick="selectPayment('cash', this)"
+                >
+                    💵 Cash
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selectPayment('upi', this)"
+                >
+                    📱 UPI
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selectPayment('bank_transfer', this)"
+                >
+                    🏦 Bank Transfer
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selectPayment('card', this)"
+                >
+                    💳 Card
+                </button>
+
+            </div>
+
+            <input
+                type="hidden"
+                name="payment_method"
+                id="payment_method"
+                required
+            >
+
+        </div>
+
+
+        <button
+            class="save-button"
+            type="submit"
+        >
+            💰 Save Salary
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- SALARY HISTORY -->
+
+<div class="section-heading">
+
+    <h2>Salary History</h2>
+
+</div>
+
+
+<div class="salary-history-list">
+
+{% for transaction in transactions %}
+
+    <div class="salary-history-card">
+
+
+        <!-- DETAILS -->
+
+        <div class="salary-details">
+
+
+            <div class="salary-row">
+
+                <span class="salary-label">
+                    Category
+                </span>
+
+                <strong>
+                    {{ transaction.category }}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-row">
+
+                <span class="salary-label">
+                    Date
+                </span>
+
+                <strong>
+                    📅
+                    {{ transaction.date.strftime("%d-%m-%Y")
+                        if transaction.date
+                        else "" }}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-row">
+
+                <span class="salary-label">
+                    Amount
+                </span>
+
+                <strong class="salary-amount">
+                    + ₹{{ "%.2f"|format(transaction.amount) }}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-row">
+
+                <span class="salary-label">
+                    Description
+                </span>
+
+                <strong>
+                    {{ transaction.description or "No description" }}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-row">
+
+                <span class="salary-label">
+                    Payment Method
+                </span>
+
+                <strong>
+
+                    {% if transaction.payment_method == "cash" %}
+                        💵 Cash
+
+                    {% elif transaction.payment_method == "upi" %}
+                        📱 UPI
+
+                    {% elif transaction.payment_method == "bank_transfer" %}
+                        🏦 Bank Transfer
+
+                    {% elif transaction.payment_method == "card" %}
+                        💳 Card
+
+                    {% else %}
+                        {{ transaction.payment_method }}
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <div class="salary-actions">
+
+
+            <a
+                href="{{ url_for(
+                    'edit_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="salary-action edit-salary"
+                title="Edit salary"
+            >
+                ✏️ Edit
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'delete_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="salary-action delete-salary"
+                title="Delete salary"
+                onclick="return confirm('Delete this salary transaction?')"
+            >
+                🗑️ Delete
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+{% else %}
+
+    <div class="empty-state">
+
+        <div>💰</div>
+
+        <h3>No salary transactions yet</h3>
+
+        <p>
+            Add your first salary transaction above.
+        </p>
+
+    </div>
+
+{% endfor %}
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+function selectPayment(method, button) {
+
+    document.getElementById("payment_method").value = method;
+
+    document
+        .querySelectorAll(".payment-buttons button")
+        .forEach(function(btn) {
+            btn.classList.remove("selected");
+        });
+
+    button.classList.add("selected");
+
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+    <h1 class="hello-title">Sooku Paapu Bandhaa👶</h1>
+
+    <p class="hello-subtitle">
+        Have a good day and keep your finances on track.
+    </p>
+
+    </div>
+
+</div>
+
+
+<!-- CURRENT MONTH SUMMARY -->
+
+<div class="summary-grid">
+
+    <div class="summary-card income-card">
+
+        <div class="summary-icon">💰</div>
+
+        <div>
+
+            <span>Total Income</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_income) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-card expense-card">
+
+        <div class="summary-icon">💸</div>
+
+        <div>
+
+            <span>Total Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(total_expenses) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-card balance-card">
+
+        <div class="summary-icon">🏦</div>
+
+        <div>
+
+            <span>Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(balance) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- RECENT TRANSACTIONS -->
+
+<div class="section-heading transaction-heading">
+
+    <div>
+
+        <h2>Recent Transactions</h2>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('search') }}"
+        class="small-link"
+    >
+        View all →
+    </a>
+
+</div>
+
+
+<div class="transaction-list">
+
+{% for transaction in transactions %}
+
+    <div class="transaction-card">
+
+        <!-- TRANSACTION DETAILS -->
+
+        <div class="transaction-details">
+
+
+            <!-- CATEGORY -->
+
+            <div class="transaction-row">
+
+                <span class="transaction-label">
+                    Category
+                </span>
+
+                <strong class="transaction-value">
+                    {{ transaction.category }}
+                </strong>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="transaction-row">
+
+                <span class="transaction-label">
+                    Date
+                </span>
+
+                <strong class="transaction-value">
+                    📅
+                    {{ transaction.date.strftime("%d-%m-%Y")
+                        if transaction.date
+                        else ""
+                    }}
+                </strong>
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="transaction-row">
+
+                <span class="transaction-label">
+                    Amount
+                </span>
+
+                <strong
+                    class="transaction-value
+                    {% if transaction.transaction_type == 'income' %}
+                        amount-income
+                    {% else %}
+                        amount-expense
+                    {% endif %}
+                    "
+                >
+
+                    {% if transaction.transaction_type == 'income' %}
+                        + ₹{{ "%.2f"|format(transaction.amount) }}
+                    {% else %}
+                        - ₹{{ "%.2f"|format(transaction.amount) }}
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="transaction-row">
+
+                <span class="transaction-label">
+                    Description
+                </span>
+
+                <span class="transaction-value">
+                    {{ transaction.description or "No description" }}
+                </span>
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="transaction-row">
+
+                <span class="transaction-label">
+                    Payment Method
+                </span>
+
+                <strong class="transaction-value">
+
+                    {% if transaction.payment_method == "cash" %}
+                        💵 Cash
+
+                    {% elif transaction.payment_method == "upi" %}
+                        📱 UPI
+
+                    {% elif transaction.payment_method == "bank_transfer" %}
+                        🏦 Bank Transfer
+
+                    {% elif transaction.payment_method == "card" %}
+                        💳 Card
+
+                    {% else %}
+                        💳 {{ transaction.payment_method|replace("_", " ")|title }}
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- EDIT / DELETE -->
+
+        <div class="transaction-actions">
+
+            <a
+                href="{{ url_for(
+                    'edit_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="action-button edit-button"
+                title="Edit transaction"
+            >
+                ✏️ Edit
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'delete_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="action-button delete-button"
+                title="Delete transaction"
+                onclick="return confirm('Delete this transaction?')"
+            >
+                🗑️ Delete
+            </a>
+
+        </div>
+
+    </div>
+
+
+{% else %}
+
+    <div class="empty-state">
+
+        <div>📭</div>
+
+        <h3>No transactions yet</h3>
+
+        <p>
+            Add your first transaction below.
+        </p>
+
+    </div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- ADD TRANSACTION -->
+
+<div class="add-transaction-area">
+
+    <button
+        type="button"
+        class="add-transaction-trigger"
+        onclick="toggleAddTransaction()"
+    >
+        ＋ Add Transaction
+    </button>
+
+
+    <div
+        class="add-transaction-box"
+        id="addTransactionBox"
+    >
+
+        <div class="add-section">
+
+            <div class="section-heading">
+
+                <h2>Add Transaction</h2>
+
+                <p class="muted">
+                    Record your income or expense.
+                </p>
+
+            </div>
+
+
+            <form
+                action="{{ url_for('add_transaction') }}"
+                method="POST"
+                class="transaction-creator"
+            >
+
+                <input
+                    type="hidden"
+                    name="transaction_type"
+                    id="transaction_type"
+                >
+
+
+                <div class="type-buttons">
+
+                    <button
+                        type="button"
+                        class="type-button income-type"
+                        onclick="selectTransactionType('income', this)"
+                    >
+                        💰 Income
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="type-button expense-type"
+                        onclick="selectTransactionType('expense', this)"
+                    >
+                        💸 Expense
+                    </button>
+
+                </div>
+
+
+                <div class="amount-box">
+
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="creator-grid">
+
+                    <div class="creator-field">
+
+                        <label>Category</label>
+
+                        <input
+                            type="text"
+                            name="category"
+                            placeholder="e.g. Food, Salary, Shopping"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="creator-field">
+
+                        <label>Description</label>
+
+                        <input
+                            type="text"
+                            name="description"
+                            placeholder="Optional note"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="payment-area">
+
+                    <label>Payment Method</label>
+
+
+                    <div class="payment-buttons">
+
+                        <button
+                            type="button"
+                            onclick="selectPayment('cash', this)"
+                        >
+                            💵 Cash
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="selectPayment('upi', this)"
+                        >
+                            📱 UPI
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="selectPayment('bank_transfer', this)"
+                        >
+                            🏦 Bank Transfer
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="selectPayment('card', this)"
+                        >
+                            💳 Card
+                        </button>
+
+                    </div>
+
+
+                    <input
+                        type="hidden"
+                        name="payment_method"
+                        id="payment_method"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    ✨ Save Transaction
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+function toggleAddTransaction() {
+
+    const box = document.getElementById("addTransactionBox");
+
+    if (box.style.display === "block") {
+
+        box.style.display = "none";
+
+    } else {
+
+        box.style.display = "block";
+
+        box.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+
+}
+
+
+function selectTransactionType(type, button) {
+
+    document.getElementById("transaction_type").value = type;
+
+    document
+        .querySelectorAll(".type-button")
+        .forEach(function(btn) {
+
+            btn.classList.remove("selected");
+
+        });
+
+    button.classList.add("selected");
+
+}
+
+
+function selectPayment(method, button) {
+
+    document.getElementById("payment_method").value = method;
+
+    document
+        .querySelectorAll(".payment-buttons button")
+        .forEach(function(btn) {
+
+            btn.classList.remove("selected");
+
+        });
+
+    button.classList.add("selected");
+
+}
+
+</script>
+
+{% endblock %}

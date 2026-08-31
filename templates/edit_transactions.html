@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <p class="eyebrow">EDIT</p>
+        <h1>✏️ Edit Transaction</h1>
+        <p class="muted">
+            Update the transaction details.
+        </p>
+    </div>
+
+</div>
+
+
+<div class="edit-card">
+
+<form
+    method="POST"
+    action="{{ url_for('update_transaction', transaction_id=transaction.transaction_id) }}"
+>
+
+
+    <input
+        type="hidden"
+        name="transaction_type"
+        value="{{ transaction.transaction_type }}"
+    >
+
+
+    <div class="amount-box">
+
+        <span>₹</span>
+
+        <input
+            type="number"
+            name="amount"
+            value="{{ transaction.amount }}"
+            step="0.01"
+            required
+        >
+
+    </div>
+
+
+    <div class="creator-field">
+
+        <label>Category</label>
+
+        <input
+            type="text"
+            name="category"
+            value="{{ transaction.category }}"
+            required
+        >
+
+    </div>
+
+
+    <div class="creator-field">
+
+        <label>Description</label>
+
+        <input
+            type="text"
+            name="description"
+            value="{{ transaction.description or '' }}"
+        >
+
+    </div>
+
+
+    <div class="payment-area">
+
+        <label>Payment Method</label>
+
+        <div class="payment-buttons">
+
+            <button
+                type="button"
+                onclick="selectPayment('cash', this)"
+                class="{% if transaction.payment_method == 'cash' %}selected{% endif %}"
+            >
+                💵 Cash
+            </button>
+
+            <button
+                type="button"
+                onclick="selectPayment('upi', this)"
+                class="{% if transaction.payment_method == 'upi' %}selected{% endif %}"
+            >
+                📱 UPI
+            </button>
+
+            <button
+                type="button"
+                onclick="selectPayment('bank_transfer', this)"
+                class="{% if transaction.payment_method == 'bank_transfer' %}selected{% endif %}"
+            >
+                🏦 Bank Transfer
+            </button>
+
+            <button
+                type="button"
+                onclick="selectPayment('card', this)"
+                class="{% if transaction.payment_method == 'card' %}selected{% endif %}"
+            >
+                💳 Card
+            </button>
+
+        </div>
+
+
+        <input
+            type="hidden"
+            name="payment_method"
+            id="payment_method"
+            value="{{ transaction.payment_method }}"
+            required
+        >
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="save-button"
+    >
+        💾 Update Transaction
+    </button>
+
+</form>
+
+</div>
+
+{% endblock %}

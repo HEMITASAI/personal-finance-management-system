@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>🔎 Search Transactions</h1>
+
+        <p class="muted">
+            Search and filter your complete transaction history.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="search-card">
+
+    <form method="GET" action="{{ url_for('search') }}">
+
+        <div class="creator-field">
+
+            <label>Search</label>
+
+            <input
+                type="text"
+                name="search"
+                value="{{ search_text }}"
+                placeholder="Category, description or payment method"
+            >
+
+        </div>
+
+
+        <div class="search-grid">
+
+            <div class="creator-field">
+
+                <label>From</label>
+
+                <input
+                    type="date"
+                    name="from_date"
+                    value="{{ from_date }}"
+                >
+
+            </div>
+
+
+            <div class="creator-field">
+
+                <label>To</label>
+
+                <input
+                    type="date"
+                    name="to_date"
+                    value="{{ to_date }}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-buttons">
+
+            <button
+                type="submit"
+                name="transaction_type"
+                value="all"
+            >
+                📋 All
+            </button>
+
+
+            <button
+                type="submit"
+                name="transaction_type"
+                value="income"
+            >
+                💰 Salary
+            </button>
+
+
+            <button
+                type="submit"
+                name="transaction_type"
+                value="expense"
+            >
+                💸 Expenses
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- SEARCH RESULTS -->
+
+<div class="section-heading transaction-heading">
+
+    <div>
+
+        <h2>Search Results</h2>
+
+    </div>
+
+</div>
+
+
+<div class="search-history-list">
+
+{% for transaction in transactions %}
+
+    <div class="search-history-card">
+
+
+        <!-- DETAILS -->
+
+        <div class="search-details">
+
+
+            <div class="search-row">
+
+                <span class="search-label">
+                    Category
+                </span>
+
+                <strong>
+                    {{ transaction.category }}
+                </strong>
+
+            </div>
+
+
+            <div class="search-row">
+
+                <span class="search-label">
+                    Date
+                </span>
+
+                <strong>
+
+                    📅
+
+                    {{ transaction.date.strftime("%d-%m-%Y")
+                       if transaction.date else "" }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="search-row">
+
+                <span class="search-label">
+                    Amount
+                </span>
+
+                <strong
+                    class="
+                    {% if transaction.transaction_type == 'income' %}
+                        search-income
+                    {% else %}
+                        search-expense
+                    {% endif %}
+                    "
+                >
+
+                    {% if transaction.transaction_type == "income" %}
+
+                        + ₹{{ "%.2f"|format(transaction.amount) }}
+
+                    {% else %}
+
+                        - ₹{{ "%.2f"|format(transaction.amount) }}
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="search-row">
+
+                <span class="search-label">
+                    Description
+                </span>
+
+                <strong>
+                    {{ transaction.description or "No description" }}
+                </strong>
+
+            </div>
+
+
+            <div class="search-row">
+
+                <span class="search-label">
+                    Payment Method
+                </span>
+
+                <strong>
+
+                    {% if transaction.payment_method == "cash" %}
+
+                        💵 Cash
+
+                    {% elif transaction.payment_method == "upi" %}
+
+                        📱 UPI
+
+                    {% elif transaction.payment_method == "bank_transfer" %}
+
+                        🏦 Bank Transfer
+
+                    {% elif transaction.payment_method == "card" %}
+
+                        💳 Card
+
+                    {% else %}
+
+                        {{ transaction.payment_method }}
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- EDIT / DELETE -->
+
+        <div class="search-actions">
+
+            <a
+                href="{{ url_for(
+                    'edit_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="search-action"
+            >
+                ✏️ Edit
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'delete_transaction',
+                    transaction_id=transaction.transaction_id
+                ) }}"
+                class="search-action"
+                onclick="return confirm('Delete this transaction?')"
+            >
+                🗑️ Delete
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+{% else %}
+
+    <div class="empty-state">
+
+        <div>🔎</div>
+
+        <h3>No matching transactions</h3>
+
+        <p>
+            Try changing your search or date filters.
+        </p>
+
+    </div>
+
+{% endfor %}
+
+</div>
+
+
+{% endblock %}

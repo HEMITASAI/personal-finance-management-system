@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#090909">
+
+    <meta name="description" content="Personal Finance Tracker">
+
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+
+    <title>
+        {% block title %}
+        Personal Finance Tracker
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    {% block head %}{% endblock %}
+
+</head>
+
+
+<body>
+
+<div class="app-shell">
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             PINNED HEMITA HEADER
+             ================================================= -->
+
+        <header class="hemita-header" id="hemitaHeader">
+
+            <!-- NORMAL GREETING -->
+
+            <div class="hemita-normal" id="normalGreeting">
+
+                <h1>Hello Hemita 👋</h1>
+
+                <p id="dailyMessage">
+                    Have a beautiful and productive day ✨
+                </p>
+
+            </div>
+
+
+            <!-- SCROLL MESSAGE -->
+
+            <div class="hemita-scroll-message"
+                 id="scrollGreeting"
+                 style="display: none;">
+
+                <h1 id="scrollGreetingText">
+                    Hemita is missing 🥺
+                </h1>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             NAVIGATION
+             ================================================= -->
+
+        <nav class="top-navigation">
+
+
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-box {% if request.endpoint == 'dashboard' %}active{% endif %}">
+
+                <span class="nav-icon">🏠</span>
+
+                <strong>Dashboard</strong>
+
+            </a>
+
+
+            <a href="{{ url_for('income') }}"
+               class="nav-box {% if request.endpoint == 'income' %}active{% endif %}">
+
+                <span class="nav-icon">💰</span>
+
+                <strong>Salary</strong>
+
+            </a>
+
+
+            <a href="{{ url_for('expenses') }}"
+               class="nav-box {% if request.endpoint == 'expenses' %}active{% endif %}">
+
+                <span class="nav-icon">💸</span>
+
+                <strong>Expenses</strong>
+
+            </a>
+
+
+            <a href="{{ url_for('search') }}"
+               class="nav-box {% if request.endpoint == 'search' %}active{% endif %}">
+
+                <span class="nav-icon">🔎</span>
+
+                <strong>Search</strong>
+
+            </a>
+
+
+            <a href="{{ url_for('analytics') }}"
+               class="nav-box {% if request.endpoint == 'analytics' %}active{% endif %}">
+
+                <span class="nav-icon">📊</span>
+
+                <strong>Analytics</strong>
+
+            </a>
+
+
+            <a href="{{ url_for('settings') }}"
+               class="nav-box {% if request.endpoint == 'settings' %}active{% endif %}">
+
+                <span class="nav-icon">⚙️</span>
+
+                <strong>Settings</strong>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- =================================================
+             PAGE CONTENT
+             ================================================= -->
+
+        {% block content %}
+        {% endblock %}
+
+
+    </main>
+
+</div>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+<!-- =================================================
+     SETTINGS
+     ================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const theme =
+        localStorage.getItem("fintrack-theme") || "dark";
+
+    const font =
+        localStorage.getItem("fintrack-font") || "inter";
+
+    const textSize =
+        localStorage.getItem("fintrack-text-size") || "medium";
+
+
+    document.body.setAttribute(
+        "data-theme",
+        theme
+    );
+
+    document.body.setAttribute(
+        "data-font",
+        font
+    );
+
+    document.body.setAttribute(
+        "data-text-size",
+        textSize
+    );
+
+});
+
+</script>
+
+
+<!-- =================================================
+     HEMITA SCROLL EFFECT
+     ================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const normalGreeting =
+        document.getElementById("normalGreeting");
+
+    const scrollGreeting =
+        document.getElementById("scrollGreeting");
+
+    const scrollGreetingText =
+        document.getElementById("scrollGreetingText");
+
+
+    let wasScrolled = false;
+    let backTimer = null;
+
+
+    /* -----------------------------------------
+       INITIAL STATE
+       ----------------------------------------- */
+
+    normalGreeting.style.display = "block";
+
+    scrollGreeting.style.display = "none";
+
+
+    /* -----------------------------------------
+       SCROLL EVENT
+       ----------------------------------------- */
+
+    window.addEventListener("scroll", function () {
+
+
+        /* =====================================
+           SCROLL DOWN
+           ===================================== */
+
+        if (window.scrollY > 100 && !wasScrolled) {
+
+            wasScrolled = true;
+
+            clearTimeout(backTimer);
+
+
+            /* Hide Hello Hemita */
+
+            normalGreeting.style.display = "none";
+
+
+            /* Set temporary message */
+
+            scrollGreetingText.textContent =
+                "👶🍼Paapu Kaanea🫣";
+
+
+            /* Force text to be visible */
+
+            scrollGreetingText.style.display =
+                "block";
+
+            scrollGreetingText.style.visibility =
+                "visible";
+
+            scrollGreetingText.style.opacity =
+                "1";
+
+
+            /* Show temporary box */
+
+            scrollGreeting.style.display =
+                "block";
+
+            scrollGreeting.style.visibility =
+                "visible";
+
+            scrollGreeting.style.opacity =
+                "1";
+
+        }
+
+
+        /* =====================================
+           RETURN TO TOP
+           ===================================== */
+
+        if (window.scrollY <= 5 && wasScrolled) {
+
+            wasScrolled = false;
+
+            clearTimeout(backTimer);
+
+
+            /* Set back message */
+
+            scrollGreetingText.textContent =
+                "👶🍼Paapu Edhagea!👼😁";
+
+
+            /* Force text to be visible */
+
+            scrollGreetingText.style.display =
+                "block";
+
+            scrollGreetingText.style.visibility =
+                "visible";
+
+            scrollGreetingText.style.opacity =
+                "1";
+
+
+            /* Show back message */
+
+            scrollGreeting.style.display =
+                "block";
+
+            scrollGreeting.style.visibility =
+                "visible";
+
+            scrollGreeting.style.opacity =
+                "1";
+
+
+            /* After 4 seconds return to normal */
+
+            backTimer = setTimeout(function () {
+
+                scrollGreeting.style.display =
+                    "none";
+
+                scrollGreeting.style.visibility =
+                    "hidden";
+
+                normalGreeting.style.display =
+                    "block";
+
+            }, 4000);
+
+        }
+
+    });
+
+});
+
+</script>
+
+
+</body>
+
+</html>

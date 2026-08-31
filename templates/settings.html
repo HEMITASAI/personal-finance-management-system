@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+<div>
+    <h1>⚙️ Settings</h1>
+
+    <p class="muted">
+        Personalize your FinTrack app.
+    </p>
+</div>
+
+</div>
+
+<div class="settings-list">
+
+<!-- =========================
+     THEME
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        🎨
+    </div>
+
+    <div class="setting-info">
+
+        <h3>Theme</h3>
+
+        <p>
+            Change the brightness of your FinTrack theme.
+        </p>
+
+        <div class="setting-options">
+
+            <button
+                type="button"
+                class="setting-option"
+                data-theme-option="dark"
+                onclick="changeTheme('dark')"
+            >
+                🌑 Dark
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-theme-option="medium"
+                onclick="changeTheme('medium')"
+            >
+                🌓 Medium
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-theme-option="bright"
+                onclick="changeTheme('bright')"
+            >
+                ☀️ Bright
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FONT
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        🔤
+    </div>
+
+    <div class="setting-info">
+
+        <h3>Font</h3>
+
+        <p>
+            Choose the font used throughout the app.
+        </p>
+
+        <div class="setting-options">
+
+            <button
+                type="button"
+                class="setting-option"
+                data-font-option="inter"
+                onclick="changeFont('inter')"
+            >
+                Inter
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-font-option="poppins"
+                onclick="changeFont('poppins')"
+            >
+                Poppins
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-font-option="nunito"
+                onclick="changeFont('nunito')"
+            >
+                Nunito
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TEXT SIZE
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        📏
+    </div>
+
+    <div class="setting-info">
+
+        <h3>Text Size</h3>
+
+        <p>
+            Change the size of text, icons and interface elements.
+        </p>
+
+        <div class="setting-options">
+
+            <button
+                type="button"
+                class="setting-option"
+                data-size-option="small"
+                onclick="changeTextSize('small')"
+            >
+                Small
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-size-option="medium"
+                onclick="changeTextSize('medium')"
+            >
+                Medium
+            </button>
+
+            <button
+                type="button"
+                class="setting-option"
+                data-size-option="large"
+                onclick="changeTextSize('large')"
+            >
+                Large
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     RESET
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        ↩️
+    </div>
+
+    <div class="setting-info">
+
+        <h3>Reset Settings</h3>
+
+        <p>
+            Return FinTrack to its original default appearance.
+        </p>
+
+    </div>
+
+    <button
+        type="button"
+        class="setting-button"
+        onclick="resetSettings()"
+    >
+        Reset
+    </button>
+
+</div>
+
+
+<!-- =========================
+     INSTALL
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        📱
+    </div>
+
+    <div class="setting-info">
+
+        <h3>App Installation</h3>
+
+        <p>
+            Install FinTrack on your phone or desktop like an app.
+        </p>
+
+    </div>
+
+    <button
+        type="button"
+        class="setting-button"
+        id="installButton"
+        onclick="installApp()"
+    >
+        Install
+    </button>
+
+</div>
+
+
+<!-- =========================
+     REFRESH
+     ========================= -->
+
+<div class="setting-card">
+
+    <div class="setting-icon">
+        🔄
+    </div>
+
+    <div class="setting-info">
+
+        <h3>Refresh App</h3>
+
+        <p>
+            Reload the latest dashboard data.
+        </p>
+
+    </div>
+
+    <button
+        type="button"
+        class="setting-button"
+        onclick="location.reload()"
+    >
+        Refresh
+    </button>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+let deferredInstallPrompt = null;
+
+
+/* =========================================================
+   LOAD CURRENT SETTINGS
+   ========================================================= */
+
+function loadSettings() {
+
+    const theme =
+        localStorage.getItem("fintrack-theme") || "dark";
+
+    const font =
+        localStorage.getItem("fintrack-font") || "inter";
+
+    const textSize =
+        localStorage.getItem("fintrack-text-size") || "medium";
+
+
+    applyTheme(theme);
+    applyFont(font);
+    applyTextSize(textSize);
+
+    updateActiveButtons(
+        theme,
+        font,
+        textSize
+    );
+}
+
+
+/* =========================================================
+   THEME
+   ========================================================= */
+
+function changeTheme(theme) {
+
+    localStorage.setItem(
+        "fintrack-theme",
+        theme
+    );
+
+    applyTheme(theme);
+
+    updateActiveButtons(
+        theme,
+        localStorage.getItem("fintrack-font") || "inter",
+        localStorage.getItem("fintrack-text-size") || "medium"
+    );
+}
+
+
+function applyTheme(theme) {
+
+    document.body.setAttribute(
+        "data-theme",
+        theme
+    );
+}
+
+
+/* =========================================================
+   FONT
+   ========================================================= */
+
+function changeFont(font) {
+
+    localStorage.setItem(
+        "fintrack-font",
+        font
+    );
+
+    applyFont(font);
+
+    updateActiveButtons(
+        localStorage.getItem("fintrack-theme") || "dark",
+        font,
+        localStorage.getItem("fintrack-text-size") || "medium"
+    );
+}
+
+
+function applyFont(font) {
+
+    document.body.setAttribute(
+        "data-font",
+        font
+    );
+}
+
+
+/* =========================================================
+   TEXT SIZE
+   ========================================================= */
+
+function changeTextSize(size) {
+
+    localStorage.setItem(
+        "fintrack-text-size",
+        size
+    );
+
+    applyTextSize(size);
+
+    updateActiveButtons(
+        localStorage.getItem("fintrack-theme") || "dark",
+        localStorage.getItem("fintrack-font") || "inter",
+        size
+    );
+}
+
+
+function applyTextSize(size) {
+
+    document.body.setAttribute(
+        "data-text-size",
+        size
+    );
+}
+
+
+/* =========================================================
+   ACTIVE BUTTONS
+   ========================================================= */
+
+function updateActiveButtons(
+    theme,
+    font,
+    textSize
+) {
+
+    document
+        .querySelectorAll("[data-theme-option]")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.themeOption === theme
+            );
+
+        });
+
+
+    document
+        .querySelectorAll("[data-font-option]")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.fontOption === font
+            );
+
+        });
+
+
+    document
+        .querySelectorAll("[data-size-option]")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.sizeOption === textSize
+            );
+
+        });
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+function resetSettings() {
+
+    localStorage.setItem(
+        "fintrack-theme",
+        "dark"
+    );
+
+    localStorage.setItem(
+        "fintrack-font",
+        "inter"
+    );
+
+    localStorage.setItem(
+        "fintrack-text-size",
+        "medium"
+    );
+
+    applyTheme("dark");
+    applyFont("inter");
+    applyTextSize("medium");
+
+    updateActiveButtons(
+        "dark",
+        "inter",
+        "medium"
+    );
+}
+
+
+/* =========================================================
+   APP INSTALLATION
+   ========================================================= */
+
+window.addEventListener(
+    "beforeinstallprompt",
+    function(event) {
+
+        event.preventDefault();
+
+        deferredInstallPrompt = event;
+
+    }
+);
+
+
+async function installApp() {
+
+    if (!deferredInstallPrompt) {
+
+        alert(
+            "Install is not available right now. Use your browser's Install App option if available."
+        );
+
+        return;
+    }
+
+
+    deferredInstallPrompt.prompt();
+
+
+    const result =
+        await deferredInstallPrompt.userChoice;
+
+
+    if (result.outcome === "accepted") {
+
+        deferredInstallPrompt = null;
+
+    }
+}
+
+
+/* =========================================================
+   PAGE LOAD
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadSettings();
+
+    }
+);
+
+</script>
+
+{% endblock %}

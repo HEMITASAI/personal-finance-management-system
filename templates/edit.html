@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Edit Transaction</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header>
+
+```
+<div class="container">
+
+    <h1>✏️ Edit Transaction</h1>
+
+    <p>Update your financial record 💰</p>
+
+</div>
+```
+
+</header>
+
+<div class="container">
+
+```
+<div class="form-box">
+
+    <h2>✏️ Update Transaction</h2>
+
+
+    <form method="POST"
+          action="/update_transaction/{{ transaction.transaction_id }}">
+
+
+        <label>Transaction Type</label>
+
+        <select name="transaction_type" required>
+
+            <option value="income"
+                {% if transaction.transaction_type == "income" %}
+                selected
+                {% endif %}>
+
+                💰 Income
+
+            </option>
+
+
+            <option value="expense"
+                {% if transaction.transaction_type == "expense" %}
+                selected
+                {% endif %}>
+
+                💸 Expense
+
+            </option>
+
+        </select>
+
+
+
+        <label>Amount</label>
+
+        <input
+            type="number"
+            name="amount"
+            value="{{ transaction.amount }}"
+            step="0.01"
+            required
+        >
+
+
+
+        <label>Date</label>
+
+        <input
+            type="date"
+            name="date"
+            value="{{ transaction.date }}"
+            required
+        >
+
+
+
+        <label>Category</label>
+
+        <input
+            type="text"
+            name="category"
+            value="{{ transaction.category }}"
+            required
+        >
+
+
+
+        <label>Description</label>
+
+        <input
+            type="text"
+            name="description"
+            value="{{ transaction.description or '' }}"
+        >
+
+
+
+        <label>Payment Method</label>
+
+        <select name="payment_method" required>
+
+
+            <option value="UPI"
+                {% if transaction.payment_method == "UPI" %}
+                selected
+                {% endif %}>
+
+                📱 UPI
+
+            </option>
+
+
+            <option value="card"
+                {% if transaction.payment_method == "card" %}
+                selected
+                {% endif %}>
+
+                💳 Card
+
+            </option>
+
+
+            <option value="bank_transfer"
+                {% if transaction.payment_method == "bank_transfer" %}
+                selected
+                {% endif %}>
+
+                🏦 Bank Transfer
+
+            </option>
+
+
+            <option value="cash"
+                {% if transaction.payment_method == "cash" %}
+                selected
+                {% endif %}>
+
+                💵 Cash
+
+            </option>
+
+
+        </select>
+
+
+
+        <button type="submit">
+
+            💾 Save Changes
+
+        </button>
+
+
+    </form>
+
+
+    <br>
+
+
+    <a href="/">
+
+        ← Back to Dashboard
+
+    </a>
+
+
+</div>
+```
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const emojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu;
+
+    document.querySelectorAll("label, h1, h2, h3, nav a, button").forEach(function (element) {
+
+        const text = element.textContent;
+
+        if (!emojiRegex.test(text)) {
+            emojiRegex.lastIndex = 0;
+            return;
+        }
+
+        emojiRegex.lastIndex = 0;
+
+        element.innerHTML = text.replace(
+            emojiRegex,
+            '<span class="ui-emoji">$&</span>'
+        );
+    });
+
+    document.querySelectorAll("input, select").forEach(function (field) {
+
+        field.addEventListener("focus", function () {
+
+            const label = field.previousElementSibling;
+
+            if (!label) {
+                return;
+            }
+
+            const emoji = label.querySelector(".ui-emoji");
+
+            if (emoji) {
+                emoji.classList.add("active");
+            }
+        });
+
+        field.addEventListener("blur", function () {
+
+            const label = field.previousElementSibling;
+
+            if (!label) {
+                return;
+            }
+
+            const emoji = label.querySelector(".ui-emoji");
+
+            if (emoji) {
+                emoji.classList.remove("active");
+            }
+        });
+    });
+
+});
+</script>
+
+
+</body>
+
+</html>

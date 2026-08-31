@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>📊 Analytics</h1>
+
+        <p class="muted">
+            Understand your money across every month and year.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOTAL SUMMARY
+     ===================================================== -->
+
+<div class="analytics-summary">
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            💰
+        </div>
+
+        <div>
+
+            <span>Total Salary</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(overall_income|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            💸
+        </div>
+
+        <div>
+
+            <span>Total Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(overall_expenses|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            🏦
+        </div>
+
+        <div>
+
+            <span>Total Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(overall_balance|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CURRENT MONTH
+     ===================================================== -->
+
+<div class="analytics-section-title">
+
+    <h2>Current Month</h2>
+
+</div>
+
+
+<div class="analytics-summary">
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            💰
+        </div>
+
+        <div>
+
+            <span>Current Month Salary</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_income|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            💸
+        </div>
+
+        <div>
+
+            <span>Current Month Expenses</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_expenses|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="analytics-summary-card">
+
+        <div class="analytics-summary-icon">
+            🏦
+        </div>
+
+        <div>
+
+            <span>Current Month Balance</span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_balance|float) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MONTHLY GRAPH
+     ===================================================== -->
+
+<div class="analytics-chart-card">
+
+    <div class="analytics-chart-heading">
+
+        <h2>Monthly Money Flow</h2>
+
+        <p>
+            Salary, expenses and balance month by month.
+        </p>
+
+    </div>
+
+    <div class="analytics-chart-container">
+
+        <canvas id="monthlyChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     YEARLY GRAPH
+     ===================================================== -->
+
+<div class="analytics-chart-card">
+
+    <div class="analytics-chart-heading">
+
+        <h2>Yearly Money Flow</h2>
+
+        <p>
+            Salary, expenses and balance year by year.
+        </p>
+
+    </div>
+
+    <div class="analytics-chart-container">
+
+        <canvas id="yearlyChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MONTHLY BREAKDOWN
+     ===================================================== -->
+
+<div class="analytics-table-card">
+
+    <div class="analytics-table-heading">
+
+        <h2>Monthly Breakdown</h2>
+
+        <p>
+            Salary, expenses and balance for every month.
+        </p>
+
+    </div>
+
+
+    <div class="analytics-table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Month</th>
+
+                    <th>Salary</th>
+
+                    <th>Expenses</th>
+
+                    <th>Balance</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% if monthly_data %}
+
+                {% for row in monthly_data %}
+
+                <tr>
+
+                    <td>
+                        {{ row.month_name }}
+                    </td>
+
+                    <td class="analytics-income">
+                        ₹{{ "%.2f"|format(row.income|float) }}
+                    </td>
+
+                    <td class="analytics-expense">
+                        ₹{{ "%.2f"|format(row.expenses|float) }}
+                    </td>
+
+                    <td class="analytics-balance">
+                        ₹{{ "%.2f"|format(row.balance|float) }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="4">
+                        No monthly data available.
+                    </td>
+
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     YEARLY BREAKDOWN
+     ===================================================== -->
+
+<div class="analytics-table-card">
+
+    <div class="analytics-table-heading">
+
+        <h2>Yearly Breakdown</h2>
+
+        <p>
+            Salary, expenses and balance for every year.
+        </p>
+
+    </div>
+
+
+    <div class="analytics-table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Year</th>
+
+                    <th>Salary</th>
+
+                    <th>Expenses</th>
+
+                    <th>Balance</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% if yearly_data %}
+
+                {% for row in yearly_data %}
+
+                <tr>
+
+                    <td>
+                        {{ row.year }}
+                    </td>
+
+                    <td class="analytics-income">
+                        ₹{{ "%.2f"|format(row.income|float) }}
+                    </td>
+
+                    <td class="analytics-expense">
+                        ₹{{ "%.2f"|format(row.expenses|float) }}
+                    </td>
+
+                    <td class="analytics-balance">
+                        ₹{{ "%.2f"|format(row.balance|float) }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="4">
+                        No yearly data available.
+                    </td>
+
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     EXPENSE CATEGORIES
+     ===================================================== -->
+
+<div class="analytics-chart-card">
+
+    <div class="analytics-chart-heading">
+
+        <h2>Expense Categories</h2>
+
+        <p>
+            See where your money is being spent.
+        </p>
+
+    </div>
+
+    <div class="analytics-category-container">
+
+        <canvas id="categoryChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- CHART.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+/* =====================================================
+   DATA FROM FLASK
+   ===================================================== */
+
+const monthlyData =
+    JSON.parse('{{ monthly_data | tojson | safe }}');
+
+const yearlyData =
+    JSON.parse('{{ yearly_data | tojson | safe }}');
+
+const categoryData =
+    JSON.parse('{{ category_expenses | tojson | safe }}');
+
+
+/* =====================================================
+   MONTHLY DATA
+   ===================================================== */
+
+const monthlyLabels =
+    monthlyData.map(
+        item => item.month_name
+    );
+
+const monthlyIncome =
+    monthlyData.map(
+        item => Number(item.income)
+    );
+
+const monthlyExpenses =
+    monthlyData.map(
+        item => Number(item.expenses)
+    );
+
+const monthlyBalance =
+    monthlyData.map(
+        item => Number(item.balance)
+    );
+
+
+/* =====================================================
+   YEARLY DATA
+   ===================================================== */
+
+const yearlyLabels =
+    yearlyData.map(
+        item => String(item.year)
+    );
+
+const yearlyIncome =
+    yearlyData.map(
+        item => Number(item.income)
+    );
+
+const yearlyExpenses =
+    yearlyData.map(
+        item => Number(item.expenses)
+    );
+
+const yearlyBalance =
+    yearlyData.map(
+        item => Number(item.balance)
+    );
+
+
+/* =====================================================
+   MONTHLY GRAPH
+   ===================================================== */
+
+const monthlyCanvas =
+    document.getElementById("monthlyChart");
+
+if (monthlyCanvas) {
+
+    new Chart(
+        monthlyCanvas,
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: monthlyLabels,
+
+                datasets: [
+
+                    {
+                        label: "Salary",
+
+                        data: monthlyIncome,
+
+                        backgroundColor: "#d4a72c",
+
+                        borderColor: "#e6bd4b",
+
+                        borderWidth: 1
+                    },
+
+
+                    {
+                        label: "Expenses",
+
+                        data: monthlyExpenses,
+
+                        backgroundColor: "#8f4c35",
+
+                        borderColor: "#c96b4b",
+
+                        borderWidth: 1
+                    },
+
+
+                    {
+                        label: "Balance",
+
+                        data: monthlyBalance,
+
+                        backgroundColor: "#6f633f",
+
+                        borderColor: "#b9a45b",
+
+                        borderWidth: 1
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: true
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            color: "rgba(212,167,44,0.12)"
+
+                        },
+
+                        ticks: {
+
+                            color: "#d4a72c"
+
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        grid: {
+
+                            color: "rgba(212,167,44,0.12)"
+
+                        },
+
+                        ticks: {
+
+                            color: "#d4a72c"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   YEARLY GRAPH
+   ===================================================== */
+
+const yearlyCanvas =
+    document.getElementById("yearlyChart");
+
+if (yearlyCanvas) {
+
+    new Chart(
+        yearlyCanvas,
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: yearlyLabels,
+
+                datasets: [
+
+                    {
+                        label: "Salary",
+
+                        data: yearlyIncome,
+
+                        backgroundColor: "#d4a72c",
+
+                        borderColor: "#e6bd4b",
+
+                        borderWidth: 1
+                    },
+
+
+                    {
+                        label: "Expenses",
+
+                        data: yearlyExpenses,
+
+                        backgroundColor: "#8f4c35",
+
+                        borderColor: "#c96b4b",
+
+                        borderWidth: 1
+                    },
+
+
+                    {
+                        label: "Balance",
+
+                        data: yearlyBalance,
+
+                        backgroundColor: "#6f633f",
+
+                        borderColor: "#b9a45b",
+
+                        borderWidth: 1
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: true
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            color: "rgba(212,167,44,0.12)"
+
+                        },
+
+                        ticks: {
+
+                            color: "#d4a72c"
+
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        grid: {
+
+                            color: "rgba(212,167,44,0.12)"
+
+                        },
+
+                        ticks: {
+
+                            color: "#d4a72c"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   EXPENSE CATEGORY GRAPH
+   ===================================================== */
+
+const categoryCanvas =
+    document.getElementById("categoryChart");
+
+if (categoryCanvas) {
+
+    new Chart(
+        categoryCanvas,
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: categoryData.map(
+                    item => item.category
+                ),
+
+                datasets: [
+
+                    {
+
+                        data: categoryData.map(
+                            item => Number(item.total)
+                        ),
+
+                        backgroundColor: [
+                            "#d4a72c",
+                            "#8f4c35",
+                            "#6f633f",
+                            "#a9823a",
+                            "#72513e",
+                            "#b9a45b"
+                        ],
+
+                        borderColor: "#111111",
+
+                        borderWidth: 3
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            color: "#d4a72c"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+</script>
+
+{% endblock %}

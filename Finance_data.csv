@@ -1,0 +1,6 @@
+transaction_id,date,transaction_type,amount,category,description,payment_method
+1,2026-11-30,income,25000.00,salary,NULL,bank_transfer
+3,2026-12-02,expense,1200.00,shopping," clothes",card
+5,2026-08-23,income,25000.00,salary,,bank_transfer
+6,2026-08-23,expense,2000.00,food,,cash
+7,2026-08-24,expense,2000.00,outing,movie,upi
